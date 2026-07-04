@@ -1,7 +1,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --font-size: 16px;
+  --font-size: clamp(16px, 0.35vw + 15px, 19px);
   --background: #F6F4EF;
   --foreground: #182130;
   --card: #FFFFFF;
@@ -124,17 +124,16 @@
     @apply border-border outline-ring/50;
   }
 
-  body {
-    @apply bg-background text-foreground;
-  }
-
-  /**
-  * Default typography styles for HTML elements (h1-h4, p, label, button, input).
-  * These are in @layer base, so Tailwind utility classes (like text-sm, text-lg) automatically override them.
-  */
-
   html {
     font-size: var(--font-size);
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-size: 1rem;
+    line-height: 1.6;
+    text-rendering: optimizeLegibility;
   }
 
   h1 {
@@ -161,21 +160,102 @@
     line-height: 1.5;
   }
 
-  label {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
-  }
-
-  button {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
-  }
-
-  input {
+  label,
+  button,
+  input,
+  select,
+  textarea {
     font-size: var(--text-base);
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    touch-action: manipulation;
+  }
+
+  button,
+  input,
+  select {
+    min-height: 2.75rem;
+  }
+
+  textarea {
+    min-height: 8rem;
+  }
+}
+
+@layer utilities {
+  .text-xs {
+    font-size: clamp(0.8125rem, 0.78rem + 0.16vw, 0.9375rem) !important;
+    line-height: 1.45rem !important;
+  }
+
+  .text-sm {
+    font-size: clamp(0.9375rem, 0.88rem + 0.18vw, 1.0625rem) !important;
+    line-height: 1.6rem !important;
+  }
+
+  .text-base {
+    font-size: clamp(1rem, 0.94rem + 0.2vw, 1.125rem) !important;
+    line-height: 1.7rem !important;
+  }
+
+  .text-lg {
+    font-size: clamp(1.125rem, 1.02rem + 0.32vw, 1.375rem) !important;
+    line-height: 1.9rem !important;
+  }
+
+  .text-xl {
+    font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.625rem) !important;
+    line-height: 2.05rem !important;
+  }
+
+  .text-2xl {
+    font-size: clamp(1.5rem, 1.24rem + 0.8vw, 2rem) !important;
+    line-height: 2.35rem !important;
+  }
+
+  .text-3xl {
+    font-size: clamp(2rem, 1.55rem + 1.35vw, 2.75rem) !important;
+    line-height: 1.18 !important;
+  }
+
+  .text-4xl {
+    font-size: clamp(2.4rem, 1.7rem + 2vw, 3.5rem) !important;
+    line-height: 1.12 !important;
+  }
+
+  .text-5xl {
+    font-size: clamp(3rem, 2rem + 2.8vw, 4.5rem) !important;
+    line-height: 1.08 !important;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --font-size: 17px;
+  }
+
+  a[class*="rounded-full"],
+  button[class*="rounded-full"] {
+    min-height: 3rem;
+    align-items: center;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --font-size: clamp(17px, 0.3vw + 15px, 20px);
   }
 }

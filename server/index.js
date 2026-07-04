@@ -11,6 +11,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const port = Number(process.env.PORT || 4000);
 const allowedOrigin = process.env.CORS_ORIGIN || "http://localhost:5173";
+const adminToken = process.env.ADMIN_TOKEN || "dev-admin-token";
 const dataDir = process.env.DATA_DIR || path.join(__dirname, "data");
 const statsFile = path.join(dataDir, "stats.json");
 
@@ -78,6 +79,17 @@ function normalizePath(value) {
 function normalizeEventType(value) {
   const allowed = new Set(["page_view", "cta_click", "contact_submit"]);
   return allowed.has(value) ? value : "custom";
+}
+
+function requireAdmin(req, res, next) {
+  const authorization = req.headers.authorization || "";
+  const token = authorization.startsWith("Bearer ") ? authorization.slice(7) : "";
+
+  if (!adminToken || token !== adminToken) {
+    return res.status(401).json({ ok: false, error: "Unauthorized" });
+  }
+
+  return next();
 }
 
 function eventFromRequest(req, overrides = {}) {
@@ -157,7 +169,7 @@ app.post("/api/contact", async (req, res, next) => {
   }
 });
 
-app.get("/api/stats", async (req, res, next) => {
+app.get("/api/stats", requireAdmin, async (req, res, next) => {
   try {
     const days = Number(req.query.days || 30);
     const start = sinceDate(days);

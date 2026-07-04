@@ -17,20 +17,41 @@ const statsFile = path.join(dataDir, "stats.json");
 app.use(cors({ origin: allowedOrigin, credentials: false }));
 app.use(express.json({ limit: "64kb" }));
 
+function emptyStore() {
+  return { events: [], contacts: [] };
+}
+
+function isValidStore(store) {
+  return store && Array.isArray(store.events) && Array.isArray(store.contacts);
+}
+
 async function ensureStore() {
   await fs.mkdir(dataDir, { recursive: true });
 
   try {
     await fs.access(statsFile);
   } catch {
-    await fs.writeFile(statsFile, JSON.stringify({ events: [], contacts: [] }, null, 2));
+    await writeStore(emptyStore());
   }
 }
 
 async function readStore() {
   await ensureStore();
-  const raw = await fs.readFile(statsFile, "utf8");
-  return JSON.parse(raw);
+
+  try {
+    const raw = await fs.readFile(statsFile, "utf8");
+    const store = raw.trim().length > 0 ? JSON.parse(raw) : emptyStore();
+
+    if (isValidStore(store)) {
+      return store;
+    }
+  } catch (error) {
+    console.warn(`Resetting analytics store because ${statsFile} is not valid JSON.`);
+  }
+
+  const store = emptyStore();
+  await writeStore(store);
+  return store;
 }
 
 async function writeStore(store) {
